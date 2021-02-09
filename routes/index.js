@@ -14,8 +14,9 @@ router.post('/face', function (req, res, next) {
   var jsonData = {
     "name": "Azim",
     "adminNo": "183574a",
+    "face": req.body.face
   }
-  console.log(req.body.face)
+  // console.log(req.body.face)
   res.json(jsonData)
 })
 
