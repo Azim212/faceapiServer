@@ -2,8 +2,21 @@ var express = require('express');
 var router = express.Router();
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+router.get('/', function (req, res, next) {
+  var jsonData = {
+    "name": "Azim",
+    "adminNo": "183574a"
+  }
+  res.json(jsonData)
 });
+
+router.post('/face', function (req, res, next) {
+  var jsonData = {
+    "name": "Azim",
+    "adminNo": "183574a",
+    "face": "you ugly"
+  }
+  res.json(jsonData)
+})
 
 module.exports = router;
