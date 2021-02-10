@@ -27,13 +27,12 @@ router.post('/face', function (req, res, next) {
   };
 
   loadModels().then(nothing => {
-
+    var image = 'data:image/jpeg;base64,' + req.body.face
     var jsonData = {
       "name": "Azim",
       "adminNo": "183574a",
-      "face": req.body.face
+      "face": image
     }
-    // console.log(req.body.face)
     res.json(jsonData)
   });
 
