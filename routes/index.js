@@ -1,9 +1,25 @@
 var router = require("express-promise-router")();
 var faceapi = require("face-api.js")
+var canvas = require("canvas")
 var fetch = require("node-fetch");
 var path = require("path")
+const jsdom = require("jsdom")
+const { JSDOM } = jsdom;
+const { document } = (new JSDOM(`...`)).window;
+const { window } = new JSDOM(`...`);
 
-faceapi.env.monkeyPatch({ fetch: fetch })
+// global.window = new JSDOM(`<!DOCTYPE html><img id="myImg" src="image.png" />`, { resources: "usable", url: "file:///" + __dirname + "/" }).window;
+global.document = window.document;
+global.HTMLImageElement = window.HTMLImageElement
+
+faceapi.env.monkeyPatch({
+  fetch: fetch,
+  Canvas: window.HTMLCanvasElement,
+  Image: window.HTMLImageElement,
+  ImageData: canvas.ImageData,
+  createCanvasElement: () => document.createElement('canvas'),
+  createImageElement: () => document.createElement('img')
+})
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -26,14 +42,40 @@ router.post('/face', function (req, res, next) {
     await faceapi.nets.faceRecognitionNet.loadFromDisk(MODEL_URL);
   };
 
-  loadModels().then(nothing => {
-    var image = 'data:image/jpeg;base64,' + req.body.face
-    var jsonData = {
-      "name": "Azim",
-      "adminNo": "183574a",
-      "face": image
+  async function getFaceDescription(input) {
+    console.log("here?")
+    const fullFaceDescription = await faceapi.detectSingleFace(input)
+      .withFaceLandmarks()
+      .withFaceDescriptor()
+
+    if (!fullFaceDescription) {
+      return "No faces found in this image."
     }
-    res.json(jsonData)
+
+    const faceDescriptors = [fullFaceDescription.descriptor]
+    return faceDescriptors
+  }
+
+  loadModels().then(nothing => {
+    var image = "data:image/png;base64, " + req.body.face
+    var dom = new JSDOM('<img src="' + image + '.com">', { resources: "usable", url: "file:///path/to/images/"});
+    var input = dom.window.document.querySelector("img")
+
+    var th = document.createElement("img")
+    th.src = image
+    // console.log(input)
+    console.log(input instanceof window.HTMLImageElement)
+
+    getFaceDescription(th).then(faceDescript => {
+    console.log("or here?")
+      var jsonData = {
+        "faceDescriptors": faceDescript
+      }
+      res.json(jsonData)
+    }).catch(err => console.log(err))
+    // res.send(input)
+
+
   });
 
 
