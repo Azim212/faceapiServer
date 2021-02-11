@@ -63,6 +63,11 @@ router.post('/face', function (req, res, next) {
     var image = "data:image/png;base64, " + req.body.face
     var imgEl = document.getElementById("faceImg")
     imgEl.src = image
+    
+    // This api route is supposed to return whether the taken picture's face matches with someone's
+    // acc in the db. Return either yes or no.
+    // However implementation is not complete as the process of getting people's faces from the db is
+    // not done yet. 
 
     getFaceDescription(imgEl).then(faceDescript => {
       var jsonData = {
