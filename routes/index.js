@@ -58,23 +58,57 @@ router.post('/face', function (req, res, next) {
 
     const faceDescriptors = fullFaceDescription.descriptor
     return faceDescriptors
+  };
+
+  async function matchFaces(input) {
+    let savedFaceDescriptorsRaw = require('../public/faceDescriptors.json');
+    let savedFaceDescriptors;
+    let tempArr = []
+
+    for (let [key, value] of Object.entries(savedFaceDescriptorsRaw)) {
+      tempArr.push(value)
+      tempArr.reverse()
+    }
+    savedFaceDescriptors = Float32Array.from(tempArr)
+    // console.log(savedFaceDescriptors)
+
+    let string = 'azim'
+    let labelledDescriptor = [
+      new faceapi.LabeledFaceDescriptors(string, [savedFaceDescriptors])
+    ]
+
+    const maxDescriptorDistance = 0.6
+    const faceMatcher = new faceapi.FaceMatcher(labelledDescriptor)
+
+    var bestMatch = faceMatcher.findBestMatch(input)
+    return bestMatch
   }
 
   loadModels().then(nothing => {
     var image = "data:image/png;base64, " + req.body.face
     var imgEl = document.getElementById("faceImg")
     imgEl.src = image
-    
+
     // This api route is supposed to return whether the taken picture's face matches with someone's
-    // acc in the db. Return either yes or no.
+    // acc in the db. Return the person's name/id if yes or no.
     // However implementation is not complete as the process of getting people's faces from the db is
     // not done yet. 
 
     getFaceDescription(imgEl).then(faceDescript => {
-      var jsonData = {
-        "faceDescriptors": faceDescript
+      // var jsonData = {
+      //   "faceDescriptors": faceDescript
+      // }
+      if (faceDescript[0] != "N") {
+        // if the return is an array of face descriptors...
+        matchFaces(faceDescript).then((thing) => {
+          console.log(thing.toString())
+          res.json(thing)
+        }).catch((err) => console.log(err))
+
+      } else {
+        res.json("No faces were detected in the image.")
       }
-      res.json(jsonData)
+      // res.json(jsonData)
     }).catch(err => console.log(err))
 
   });
