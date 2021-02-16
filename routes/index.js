@@ -3,6 +3,7 @@ var faceapi = require("face-api.js")
 var canvas = require("canvas")
 var fetch = require("node-fetch");
 var path = require("path")
+require('@tensorflow/tfjs-node');
 const jsdom = require("jsdom")
 const { JSDOM } = jsdom;
 
