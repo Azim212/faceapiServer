@@ -61,20 +61,25 @@ router.post('/face', function (req, res, next) {
   };
 
   async function matchFaces(input) {
-    let savedFaceDescriptorsRaw = require('../public/faceDescriptors.json');
+    let savedFaceDescriptorsRaw = require('../public/faceDescriptorsMultiple.json');
     let savedFaceDescriptors;
-    let tempArr = []
+    let tempArr = [];
+    let arrFaceDesc = [];
 
-    for (let [key, value] of Object.entries(savedFaceDescriptorsRaw)) {
-      tempArr.push(value)
-      tempArr.reverse()
+    for (var i = 0; i < savedFaceDescriptorsRaw.length; i++) {
+      for (let [key, value] of Object.entries(savedFaceDescriptorsRaw[i])) {
+        tempArr.push(value)
+        tempArr.reverse()
+      }
+      savedFaceDescriptors = Float32Array.from(tempArr)
+      tempArr = []
+      arrFaceDesc.push(savedFaceDescriptors)
     }
-    savedFaceDescriptors = Float32Array.from(tempArr)
-    // console.log(savedFaceDescriptors)
 
+    console.log(arrFaceDesc)
     let string = 'azim'
     let labelledDescriptor = [
-      new faceapi.LabeledFaceDescriptors(string, [savedFaceDescriptors])
+      new faceapi.LabeledFaceDescriptors(string, arrFaceDesc)
     ]
 
     const maxDescriptorDistance = 2
@@ -103,7 +108,10 @@ router.post('/face', function (req, res, next) {
         matchFaces(faceDescript).then((thing) => {
           console.log(thing.toString())
           res.json(thing)
-        }).catch((err) => console.log(err))
+        }).catch((err) => {
+          console.log(err)
+          res.json("Error occured while matching faces.")
+        })
 
       } else {
         res.json("No faces were detected in the image.")
