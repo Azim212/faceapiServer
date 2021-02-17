@@ -82,7 +82,7 @@ router.post('/face', function (req, res, next) {
       new faceapi.LabeledFaceDescriptors(string, arrFaceDesc)
     ]
 
-    const maxDescriptorDistance = 2
+    const maxDescriptorDistance = 0.6
     const faceMatcher = new faceapi.FaceMatcher(labelledDescriptor, maxDescriptorDistance)
 
     var bestMatch = faceMatcher.findBestMatch(input)
