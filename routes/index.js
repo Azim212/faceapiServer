@@ -69,14 +69,14 @@ router.post('/face', function (req, res, next) {
     for (var i = 0; i < savedFaceDescriptorsRaw.length; i++) {
       for (let [key, value] of Object.entries(savedFaceDescriptorsRaw[i])) {
         tempArr.push(value)
-        tempArr.reverse()
+        // tempArr.reverse()
       }
       savedFaceDescriptors = Float32Array.from(tempArr)
       tempArr = []
       arrFaceDesc.push(savedFaceDescriptors)
     }
 
-    console.log(arrFaceDesc)
+    // console.log(arrFaceDesc)
     let string = 'azim'
     let labelledDescriptor = [
       new faceapi.LabeledFaceDescriptors(string, arrFaceDesc)
